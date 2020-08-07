@@ -57,6 +57,7 @@ import * as wrongAnimation from './assets/13865-sign-for-error-flat-style.json';
 import * as errorAnimation from './assets/23919-error-doggy.json';
 
 const body = document.getElementsByTagName('body')[0];
+const axios = require('axios').default;
 
 export default {
   name: 'App',
@@ -74,18 +75,23 @@ export default {
 	}),
 	methods : {
 		check(){
+			if(this.keyword == '')
+				return;
 			this.state = 1;
-			setTimeout(()=>{
-				let ret = Math.floor(Math.random()*3)
+			let e = this;
+			axios.post('https://cvdbe.herokuapp.com/detect', {
+				issue: e.keyword
+			})
+			.then(function (response) {
+				if(response.data.message.toUpperCase() == "SUCCESS")
+					e.state = 2;
+				else
+					e.state = 3;
+			})
+			.catch(function (error) {
+				e.state = 4;
+			});
 
-				if(ret == 0){ // Truth
-					this.state = 2;
-				} else if (ret == 1){ // Wrong
-					this.state = 3;
-				} else { // error
-					this.state = 4;
-				}
-			}, 2000)
 		},
 		again(){
 			this.state = 0;
